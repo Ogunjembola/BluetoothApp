@@ -26,7 +26,6 @@ import com.appevolutionng.bluetooth.ui.ListInteractionListener
 import com.appevolutionng.bluetooth.ui.RecyclerViewProgressEmptySupport
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import pub.devrel.easypermissions.EasyPermissions
 
 class MainActivity : AppCompatActivity(), ListInteractionListener<BluetoothDevice> {
     private val TAG = "MainActivity"
@@ -78,11 +77,19 @@ class MainActivity : AppCompatActivity(), ListInteractionListener<BluetoothDevic
                 bluetooth.turnOnBluetoothAndScheduleDiscovery()
             } else {
                 if (!bluetooth.isDiscovering()) {
-                    Snackbar.make(view, R.string.device_discovery_started, Snackbar.LENGTH_SHORT)
+                    Snackbar.make(
+                        view,
+                        R.string.device_discovery_started,
+                        Snackbar.LENGTH_SHORT
+                    )
                         .show()
                     bluetooth.startDiscovery()
                 } else {
-                    Snackbar.make(view, R.string.device_discovery_stopped, Snackbar.LENGTH_SHORT)
+                    Snackbar.make(
+                        view,
+                        R.string.device_discovery_stopped,
+                        Snackbar.LENGTH_SHORT
+                    )
                         .show()
                     bluetooth.cancelDiscovery()
                 }
@@ -95,16 +102,22 @@ class MainActivity : AppCompatActivity(), ListInteractionListener<BluetoothDevic
     }
 
     private fun checkBluetoothScanPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Permission is not granted, request it
+        val permission1 =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permission2 =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+        if (permission1 != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.BLUETOOTH_SCAN),
-                REQUEST_BLUETOOTH_SCAN_PERMISSION
+                PERMISSIONS_STORAGE,
+                1
+            );
+        } else if (permission2 != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(
+                this,
+                PERMISSIONS_LOCATION,
+                1
             )
         }
     }
@@ -200,6 +213,25 @@ class MainActivity : AppCompatActivity(), ListInteractionListener<BluetoothDevic
 
         }
     }
+
+    private val PERMISSIONS_STORAGE = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH_PRIVILEGED
+    )
+    private val PERMISSIONS_LOCATION = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH_PRIVILEGED
+    )
 }
 
 
